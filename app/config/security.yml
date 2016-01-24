@@ -1,0 +1,45 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+    encoders:
+        ApiBundle\Entity\User: plaintext
+    providers:
+        api:
+            id: api.user_provider
+        app:
+            entity:
+                class: ApiBundle\Entity\User
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api:
+            pattern: /api
+            logout:
+                path:   /api/logout
+                target: /
+            guard:
+                authenticators:
+                    - token_authenticator
+        app:
+            pattern: /
+            anonymous: ~
+            logout:
+                path:   /logout
+                target: /
+            guard:
+                authenticators:
+                    - form_authenticator
+            remember_me:
+                secret:   '%secret%'
+                lifetime: 604800 # 1 week in seconds
+                path:     /
+                remember_me_parameter: remember_me
+
+    access_control:
+        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api, roles: [ IS_AUTHENTICATED_FULLY ] }
+        - { path: ^/, roles: [ IS_AUTHENTICATED_FULLY, IS_AUTHENTICATED_REMEMBERED ] }

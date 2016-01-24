@@ -1,0 +1,29 @@
+parameters:
+#    parameter_name: value
+
+services:
+    token_authenticator:
+          class: ApiBundle\Security\TokenAuthenticator
+          arguments: ["@token_helper"]
+
+    form_authenticator:
+          class: AppBundle\Security\FormAuthenticator
+          arguments: ["@router", "@security.password_encoder"]
+
+    token_helper:
+        class: ApiBundle\Service\TokenHelper
+        arguments: [%secret]
+
+    api.user_manager:
+        class: Doctrine\ORM\EntityManager
+        factory: ["@doctrine", getManagerForClass]
+        arguments: ["ApiBundle:User"]
+
+    api.user_repository:
+        class: ApiBundle\Repository\UserRepository
+        factory: ["@api.user_manager", getRepository]
+        arguments: ["ApiBundle:User"]
+
+    api.user_provider:
+        class: ApiBundle\Provider\UserProvider
+        arguments: ["@api.user_repository"]
